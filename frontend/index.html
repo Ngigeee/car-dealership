@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Client</title>
+<link rel="stylesheet" href="../styles/register.css">
+
+
+</head>
+<body>
+<h1 class="titling">CAR DEALERSHIP MANAGEMENT SYSTEM</h1>
+    
+    <div class="tooltip">
+        <h2>Register</h2>
+        <span class="tooltiptext" id="tooltiptext"></span>
+        <br><br>
+        <label>Email:</label>
+        <input type="text" name="email" id="email" required>
+        <br><br>
+        <label>Password:</label>
+        <input type="password" name="password" id="password" required>
+        <br><br>
+        <button id="registerButton">Register</button>
+        <button id="loginButton">Login</button>
+    </div>
+
+    <script>
+       document.getElementById('registerButton').addEventListener('click', async function(event) {
+    event.preventDefault(); // Prevent default button action
+
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    const mydata = { email, password };
+
+    try {
+        const response = await fetch('registerUser.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(mydata)
+        });
+
+        const data = await response.json();
+        const tooltip = document.getElementById('tooltiptext');
+        tooltip.innerHTML = data['message']; // Display response in tooltip
+
+        // Set tooltip color based on registration success
+        if (data['message'] === 'User registered successfully') {
+            tooltip.style.backgroundColor = 'green';
+            tooltip.style.color = 'white';
+
+            // Fetch session data
+            try {
+                const sessionResponse = await fetch('gettingloggedinUser.php');
+                if (!sessionResponse.ok) {
+                    const errorData = await sessionResponse.json();
+                    throw new Error(errorData.message);
+                }
+
+                const sessionData = await sessionResponse.json();
+                if (sessionData.user_id) {
+                    alert("User ID: " + sessionData.user_id);
+                    const encoder = new TextEncoder();
+                    const userData = encoder.encode(sessionData.user_id.toString());
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', userData);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    
+
+                    localStorage.setItem('myVariable', hashHex); // Store it in local storage
+
+                    setTimeout(() => {
+                        location.href = 'http://localhost:8000/home'; // Redirect after 3 seconds
+                    }, 3000);
+                } else {
+                    alert("User is not logged in");
+                    setTimeout(() => {
+                        location.href = "index.html"; // Redirect to login or index page
+                    }, 3000);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert("Data not sent to the server");
+            }
+        } else {
+            tooltip.style.backgroundColor = 'red'; // Error color
+            tooltip.style.color = 'white';
+        }
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert("An error occurred during registration");
+    }
+});
+
+    </script>
+
+</body>
+</html>

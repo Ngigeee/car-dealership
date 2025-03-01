@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="../styles/home.css">
+<head>
+<title>Home</title>
+</head>
+<body>
+
+<header>
+<h1 class="projectTtl">CAR DEALERSHIP MANAGEMENT SYSTEM</h1>
+</header>
+
+<nav>
+<h3>Order Management</h3>
+  <div class="form-container">
+    <select id="carSelect">
+      <option value="BMW X5">BMW X5 - $50,000</option>
+      <option value="Mercedes Benz A-Class">Mercedes Benz A-Class - $40,000</option>
+      <option value="Audi Q7">Audi Q7 - $55,000</option>
+    </select>
+    <input type="number" placeholder="Quantity" id="quantity" min="1" value="1">
+    <button class="placeOrd" onclick="placeOrder()">Place Order</button>
+  </div>
+  <div class="latest-search">
+    <h4>Latest Search</h4>
+    <p id="latestSearch">None</p>
+  </div>
+  <div class="total-info">
+    <h4>Total Amount Spent</h4>
+    <p id="totalSpent">$0.00</p>
+    <h4>Discounts Given</h4>
+    <p id="totalDiscounts">$0.00</p>
+    <h4>Cars Bought</h4>
+    <p id="totalDiscounts">$0.00</p>
+    <h4>Spare Parts Bought</h4>
+    <p id="totalDiscounts">$0.00</p>
+  </div>
+</nav>
+
+<section>
+<h2>CAR Gallery</h2>
+  <div class="row">
+    <div class="column">
+      <img src="../images/backgroundphoto.jpg" style="width:100%;height:100px;" onclick="displayImage(this.src, 1)" class="hover-shadow cursor">
+      <div class="desc">BMW X5: A luxurious and powerful SUV.</div>
+    </div>
+    <div class="column">
+      <img src="../images/image1.jpg" style="width:100%;height:100px;" onclick="displayImage(this.src, 2)" class="hover-shadow cursor">
+      <div class="desc">Mercedes Benz A-Class: A compact luxury car.</div>
+    </div>
+    <div class="column">
+      <img src="../images/image2.jpg" style="width:100%;height:100px;" onclick="displayImage(this.src, 3)" class="hover-shadow cursor">
+      <div class="desc">Audi Q7: A spacious and high-end SUV.</div>
+    </div>
+    <div class="column">
+      <img src="../images/image3.jpg" style="width:100%;height:100px;" onclick="displayImage(this.src, 4)" class="hover-shadow cursor">
+      <div class="desc">Audi Q7: Exceptional performance and design.</div>
+    </div>
+  </div>
+
+  <div id="imageDisplay" style="text-align:center; margin-top:20px;">
+    <img id="displayedImage" src="../images/backgroundphoto.jpg" style="max-width:100%; height:250px; object-fit:cover;">
+    <div id="imageNumber">1</div>
+    <div class="arrow arrow-left" onclick="navigateImage(-1)">&#10094;</div>
+    <div class="arrow arrow-right" onclick="navigateImage(1)">&#10095;</div>
+  </div>
+</section>
+
+<section class="details">
+
+
+<div class="floating-box">
+<h3>Car Inventory</h3>
+  <table class="car-inventory">
+    <tr>
+      <th>Model</th>
+      <th>Price</th>
+      <th>Availability</th>
+    </tr>
+    <tr>
+      <td>BMW X5</td>
+      <td>$50,000</td>
+      <td>Available</td>
+    </tr>
+    <tr>
+      <td>Mercedes Benz A-Class</td>
+      <td>$40,000</td>
+      <td>Sold Out</td>
+    </tr>
+    <tr>
+      <td>Audi Q7</td>
+      <td>$55,000</td>
+      <td>Available</td>
+    </tr>
+  </table>
+
+</div>
+<div class="floating-box">
+<!-- Customer Registration Form -->
+  <h2>Customer Registration</h2>
+  <div class="form-container">
+    <input type="text" placeholder="First Name" id="firstName">
+    <input type="text" placeholder="Last Name" id="lastName">
+    <input type="email" placeholder="Email" id="email">
+    <input type="tel" placeholder="Phone Number" id="phone">
+    <button class="placeOrd" onclick="registerCustomer()">Submit</button>
+  </div>
+</div>
+<div class="floating-box">
+ <!-- Sales Graph -->
+  <h2>Customer Purchases Over One Week</h2>
+  <div class="chart-container">
+    <canvas id="salesChart"></canvas>
+  </div>
+</div>
+</div>
+
+
+</section>
+
+<footer>
+Copyright © kirinyaga university.com
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script  src="../javascript/home.js">
+  
+</script>
+
+</body>
+
+
+</html>

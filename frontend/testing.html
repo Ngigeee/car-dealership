@@ -1,0 +1,135 @@
+var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    var renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('carCanvas').appendChild(renderer.domElement);
+
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = 0.5;
+    controls.enableZoom = true;
+
+    var light = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(light);
+
+    var directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+
+    var loader = new THREE.GLTFLoader();
+    var car, leftDoor, rightDoor, wheels = [];
+    var carIndex = 0;
+    var carModels = ['../images/peugeot/scene.gltf', '../images/tesla_mode3/scene.gltf', '../images/bugatti/scene.gltf'];
+    var isRotating = false;
+    var autoSpin = true; // Auto-spin flag
+    var rotationSpeed = 0.03;
+    var targetRotation = 0;
+    var currentRotation = 0;
+    var isDragging = false;
+    var previousMouseX = 0;
+
+    // Set white background
+    scene.background = new THREE.Color(0xffffff);
+
+    // Load background outside of car display
+    document.body.style.backgroundImage = "url('../images/racing_background.jpg')";
+    document.body.style.backgroundSize = "cover";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundPosition = "center";
+
+    function loadCarModel(carIndex) {
+        if (car) scene.remove(car);
+
+        loader.load(carModels[carIndex], function (gltf) {
+            car = gltf.scene;
+            scene.add(car);
+            car.scale.set(1.4, 1.4, 1.4);
+            car.position.set(0, -1, 0);
+            car.rotation.y = Math.PI;
+            targetRotation = Math.PI;
+            currentRotation = Math.PI;
+
+            leftDoor = car.getObjectByName("door_left");
+            rightDoor = car.getObjectByName("door_right");
+            wheels = [];
+            car.traverse(child => { if (child.name.includes("wheel")) wheels.push(child); });
+
+            // Disable zoom for the third car
+            controls.enableZoom = carIndex !== 2;
+        });
+    }
+
+    loadCarModel(carIndex);
+    camera.position.set(3, 2, 5);
+
+    function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+
+        // Auto-rotation feature
+        if (autoSpin) {
+            currentRotation += rotationSpeed;
+        }
+
+        if (isRotating) {
+            if (Math.abs(currentRotation - targetRotation) > 0.01) {
+                currentRotation += rotationSpeed * Math.sign(targetRotation - currentRotation);
+                car.rotation.y = currentRotation;
+            } else {
+                isRotating = false;
+                car.rotation.y = targetRotation;
+                currentRotation = targetRotation;
+            }
+        } else {
+            car.rotation.y = currentRotation;
+        }
+
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Cursor Rotation
+    document.addEventListener('mousedown', (event) => {
+        isDragging = true;
+        previousMouseX = event.clientX;
+        autoSpin = false; // Stop auto-spin when dragging
+    });
+
+    document.addEventListener('mousemove', (event) => {
+        if (isDragging && car) {
+            let deltaX = event.clientX - previousMouseX;
+            car.rotation.y += deltaX * 0.005;
+            previousMouseX = event.clientX;
+        }
+    });
+
+    document.addEventListener('mouseup', () => { isDragging = false; autoSpin = true; }); // Resume auto-spin on mouse up
+
+    document.getElementById('rotateButton').addEventListener('click', function () {
+        if (!isRotating) {
+            targetRotation += 2 * Math.PI;
+            isRotating = true;
+        }
+    });
+
+    document.getElementById('resetButton').addEventListener('click', function () {
+        targetRotation = Math.PI;
+        currentRotation = car.rotation.y;
+        isRotating = true;
+    });
+
+    document.getElementById('removeAerialViewButton').addEventListener('click', function () {
+        camera.position.set(3, 2, 5);
+        camera.lookAt(scene.position);
+    });
+
+    document.getElementById('prevCarButton').addEventListener('click', function () {
+        carIndex = (carIndex - 1 + carModels.length) % carModels.length;
+        loadCarModel(carIndex);
+    });
+
+    document.getElementById('nextCarButton').addEventListener('click', function () {
+        carIndex = (carIndex + 1) % carModels.length;
+        loadCarModel(carIndex);
+    });
